@@ -11,9 +11,10 @@ namespace CWSStart.Web.CWSExtensions
 {
     public static class EmailHelper
     {
-        private const string SMTPServer     = "smtp.mandrillapp.com";
-        private const string SMTPUser       = "warren@creativewebspecialist.co.uk";
-        private const string SMTPPassword   = "h4GMK-gX9CB7KXjUePMNaA";
+        private const string SMTPServer = "smtp.mandrillapp.com";
+        private const string SMTPUser = "warren@creativewebspecialist.co.uk";
+        private const string SMTPPassword = "h4GMK-gX9CB7KXjUePMNaA";
+        private const int SMTPPort = 25;
 
         public static SmtpClient GetSmtpClient()
         {
@@ -22,19 +23,27 @@ namespace CWSStart.Web.CWSExtensions
             var homepage = UmbracoContext.Current.ContentCache.GetAtRoot().SingleOrDefault(x => x.DocumentTypeAlias == "CWS-Home");
 
             //Get values from homenode, with fallback to Mandrill constant's above
-            var server  = homepage.GetPropertyValue("smtpServer", SMTPServer).ToString();
-            var user    = homepage.GetPropertyValue("smtpUser", SMTPUser).ToString();
-            var pass    = homepage.GetPropertyValue("smtpPassword", SMTPPassword).ToString();
+            var server = homepage.GetPropertyValue("smtpServer", SMTPServer).ToString();
+            var user = homepage.GetPropertyValue("smtpUsername", SMTPUser).ToString();
+            var pass = homepage.GetPropertyValue("smtpPassword", SMTPPassword).ToString();
+            int port;
+            bool useSsl = Convert.ToBoolean(homepage.GetPropertyValue("useSsl").ToString());
 
             //Do a null check just in case homepage node values are empty (fallback to Constants)
-            server  = String.IsNullOrEmpty(server) ? SMTPServer : server;
-            user    = String.IsNullOrEmpty(user) ? SMTPUser : user;
-            pass    = String.IsNullOrEmpty(pass) ? SMTPPassword : pass;
+            server = String.IsNullOrEmpty(server) ? SMTPServer : server;
+            user = String.IsNullOrEmpty(user) ? SMTPUser : user;
+            pass = String.IsNullOrEmpty(pass) ? SMTPPassword : pass;
+            if (!int.TryParse(homepage.GetPropertyValue("smtpPort", SMTPPort).ToString(), out port))
+            {
+                port = SMTPPort;
+            }
 
             //Create new SmtpClient
-            var smtp            = new SmtpClient();
-            smtp.Host           = server;
-            smtp.Credentials    = new NetworkCredential(user, pass);
+            var smtp = new SmtpClient();
+            smtp.Host = server;
+            smtp.EnableSsl = useSsl;
+            smtp.Credentials = new NetworkCredential(user, pass);
+            smtp.Port = port;
 
             //Return the SMTP object
             return smtp;
@@ -44,13 +53,13 @@ namespace CWSStart.Web.CWSExtensions
         public static void SendContactEmail(ContactFormViewModel model, string emailTo, string emailSubject)
         {
             //Create email address with friednyl displat names
-            MailAddress emailAddressFrom    = new MailAddress(model.Email, model.Name);
-            MailAddress emailAddressTo      = new MailAddress(emailTo, "CWS Contact Form");
+            MailAddress emailAddressFrom = new MailAddress(model.Email, model.Name);
+            MailAddress emailAddressTo = new MailAddress(emailTo, "CWS Contact Form");
 
             //Generate an email message object to send
-            MailMessage email   = new MailMessage(emailAddressFrom, emailAddressTo);
-            email.Subject       = emailSubject;
-            email.Body          = model.Message;
+            MailMessage email = new MailMessage(emailAddressFrom, emailAddressTo);
+            email.Subject = emailSubject;
+            email.Body = model.Message;
 
             try
             {
@@ -72,8 +81,8 @@ namespace CWSStart.Web.CWSExtensions
         public static void SendResetPasswordEmail(string memberEmail, string emailFrom, string emailSubject, string resetGUID)
         {
             //Reset link
-            string baseURL  = HttpContext.Current.Request.Url.AbsoluteUri.Replace(HttpContext.Current.Request.Url.AbsolutePath, string.Empty);
-            var resetURL    = baseURL + "/reset-password?resetGUID=" + resetGUID;
+            string baseURL = HttpContext.Current.Request.Url.AbsoluteUri.Replace(HttpContext.Current.Request.Url.AbsolutePath, string.Empty);
+            var resetURL = baseURL + "/reset-password?resetGUID=" + resetGUID;
 
             var message = string.Format(
                                 "<h3>Reset Your Password</h3>" +
@@ -83,10 +92,10 @@ namespace CWSStart.Web.CWSExtensions
                                 resetURL);
 
             //Create email message to send
-            var email           = new MailMessage(emailFrom, memberEmail);
-            email.Subject       = emailSubject;
-            email.IsBodyHtml    = true;
-            email.Body          = message;
+            var email = new MailMessage(emailFrom, memberEmail);
+            email.Subject = emailSubject;
+            email.IsBodyHtml = true;
+            email.Body = message;
 
             try
             {
@@ -109,8 +118,8 @@ namespace CWSStart.Web.CWSExtensions
         public static void SendVerifyEmail(string memberEmail, string emailFrom, string emailSubject, string verifyGUID)
         {
             //Verify link
-            string baseURL  = HttpContext.Current.Request.Url.AbsoluteUri.Replace(HttpContext.Current.Request.Url.AbsolutePath, string.Empty);
-            var verifyURL   = baseURL + "/verify-email?verifyGUID=" + verifyGUID;
+            string baseURL = HttpContext.Current.Request.Url.AbsoluteUri.Replace(HttpContext.Current.Request.Url.AbsolutePath, string.Empty);
+            var verifyURL = baseURL + "/verify-email?verifyGUID=" + verifyGUID;
 
             var message = string.Format(
                                 "<h3>Verify Your Email</h3>" +
@@ -119,10 +128,10 @@ namespace CWSStart.Web.CWSExtensions
                                 verifyURL);
 
             //Create email message to send
-            var email           = new MailMessage(emailFrom, memberEmail);
-            email.Subject       = emailSubject;
-            email.IsBodyHtml    = true;
-            email.Body          = message;
+            var email = new MailMessage(emailFrom, memberEmail);
+            email.Subject = emailSubject;
+            email.IsBodyHtml = true;
+            email.Body = message;
 
             try
             {
