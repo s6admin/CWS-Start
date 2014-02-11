@@ -11,9 +11,9 @@ namespace CWSStart.Web.CWSExtensions
 {
     public static class EmailHelper
     {
-        private const string SMTPServer = "smtp.mandrillapp.com";
-        private const string SMTPUser = "warren@creativewebspecialist.co.uk";
-        private const string SMTPPassword = "h4GMK-gX9CB7KXjUePMNaA";
+        private const string SMTPServer = ""; //"smtp.mandrillapp.com";
+        private const string SMTPUser = ""; //"warren@creativewebspecialist.co.uk";
+        private const string SMTPPassword = ""; //"h4GMK-gX9CB7KXjUePMNaA";
         private const int SMTPPort = 25;
 
         public static SmtpClient GetSmtpClient()
@@ -52,9 +52,9 @@ namespace CWSStart.Web.CWSExtensions
 
         public static void SendContactEmail(ContactFormViewModel model, string emailTo, string emailSubject)
         {
-            //Create email address with friednyl displat names
+            //Create email address with friendly display names
             MailAddress emailAddressFrom = new MailAddress(model.Email, model.Name);
-            MailAddress emailAddressTo = new MailAddress(emailTo, "CWS Contact Form");
+            MailAddress emailAddressTo = new MailAddress(emailTo, "Contact Form");
 
             //Generate an email message object to send
             MailMessage email = new MailMessage(emailAddressFrom, emailAddressTo);
@@ -86,8 +86,7 @@ namespace CWSStart.Web.CWSExtensions
 
             var message = string.Format(
                                 "<h3>Reset Your Password</h3>" +
-                                "<p>You have requested to reset your password<br/>" +
-                                "If you have not requested to reste your password, simply ignore this email and delete it</p>" +
+                                "<p>If you have not requested to reset your password please ignore and delete this email.</p>" +
                                 "<p><a href='{0}'>Reset your password</a></p>",
                                 resetURL);
 
@@ -115,6 +114,31 @@ namespace CWSStart.Web.CWSExtensions
 
         }
 
+        public static void SendForgottenPasswordEmail(string memberEmail, string memberPassword, string emailFrom, string emailSubject, string verifyGUID)
+        {
+
+            var message = string.Format(
+                               "<h3>Your Password</h3>" +
+                               "<p>Here is your forgotten password:</p>"+
+                               "<p><b>" + memberPassword + "</b></p>"+
+                               "<p>For security purposes please delete and remove this email from your trash as soon as possible.</p>");
+
+            MailMessage email = new MailMessage(emailFrom, memberEmail);
+            email.Subject = emailSubject;
+            email.IsBodyHtml = true;
+            email.Body = message;
+
+            try
+            {
+                SmtpClient smtp = GetSmtpClient();
+                smtp.Send(email);
+            }
+            catch (Exception ex) {
+                
+                throw ex;
+            }
+        }
+
         public static void SendVerifyEmail(string memberEmail, string emailFrom, string emailSubject, string verifyGUID)
         {
             //Verify link
@@ -123,8 +147,8 @@ namespace CWSStart.Web.CWSExtensions
 
             var message = string.Format(
                                 "<h3>Verify Your Email</h3>" +
-                                "<p>Click here to verify your email address and active your account today</p>" +
-                                "<p><a href='{0}'>Verify your email & active your account</a></p>",
+                                "<p>Click here to verify your email address and activate your account.</p>" +
+                                "<p><a href='{0}'>Verify your email & activate your account</a></p>",
                                 verifyURL);
 
             //Create email message to send
@@ -149,5 +173,19 @@ namespace CWSStart.Web.CWSExtensions
             }
         }
 
+        public static void SendSignUpEmailToAdmin(string memberEmail, string emailFrom, string emailSubject, string verifyGUID)
+        {
+            MailMessage email = new MailMessage();
+
+            try
+            {   
+                SmtpClient smtp = GetSmtpClient();
+                smtp.Send(email); //Try & send the email with the SMTP settings
+            }
+            catch (Exception ex)
+            {
+                throw ex; //Throw an exception if there is a problem sending the email
+            }
+        }
     }
 }

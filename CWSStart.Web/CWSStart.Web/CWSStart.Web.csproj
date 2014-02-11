@@ -285,6 +285,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="usercontrols\Dashboard\ViewContactLogs.ascx.cs">
       <DependentUpon>ViewContactLogs.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="usercontrols\Dashboard\ViewContactLogs.ascx.designer.cs">
       <DependentUpon>ViewContactLogs.ascx</DependentUpon>

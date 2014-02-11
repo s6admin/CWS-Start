@@ -30,10 +30,12 @@ namespace CWSStart.Web.Controllers
                 profileModel.EmailAddress   = currentMember.Email;
                 profileModel.MemberID       = currentMember.Id;
                 profileModel.Description    = currentMember.getProperty("description").Value.ToString();
-                profileModel.ProfileURL     = currentMember.getProperty("profileURL").Value.ToString();
-                profileModel.Twitter        = currentMember.getProperty("twitter").Value.ToString();
-                profileModel.LinkedIn       = currentMember.getProperty("linkedIn").Value.ToString();
-                profileModel.Skype          = currentMember.getProperty("skype").Value.ToString();
+                
+                // S6 Remove the following from Member details:
+                //profileModel.ProfileURL     = currentMember.getProperty("profileURL").Value.ToString(); 
+                //profileModel.Twitter        = currentMember.getProperty("twitter").Value.ToString();
+                //profileModel.LinkedIn       = currentMember.getProperty("linkedIn").Value.ToString();
+                //profileModel.Skype          = currentMember.getProperty("skype").Value.ToString();
             }
             else
             {
@@ -62,10 +64,10 @@ namespace CWSStart.Web.Controllers
             updateMember.Text                               = model.Name;
             updateMember.Email                              = model.EmailAddress;
             updateMember.getProperty("description").Value   = model.Description;
-            updateMember.getProperty("profileURL").Value    = model.ProfileURL;
-            updateMember.getProperty("twitter").Value       = model.Twitter;
-            updateMember.getProperty("linkedIn").Value      = model.LinkedIn;
-            updateMember.getProperty("skype").Value         = model.Skype;
+            //updateMember.getProperty("profileURL").Value    = model.ProfileURL;
+            //updateMember.getProperty("twitter").Value       = model.Twitter;
+            //updateMember.getProperty("linkedIn").Value      = model.LinkedIn;
+            //updateMember.getProperty("skype").Value         = model.Skype;
 
             //Save the member
             updateMember.Save();

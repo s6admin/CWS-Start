@@ -13,6 +13,8 @@ using Umbraco.Web.Mvc;
 using CWSStart.Web.Models;
 using System.Net.Sockets;
 
+using umbraco.providers; // S6
+
 namespace CWSStart.Web.Controllers
 {
     public class AuthSurfaceController : SurfaceController
@@ -291,12 +293,18 @@ namespace CWSStart.Web.Controllers
                 //Save the member with the up[dated property value
                 findMember.Save();
 
-                //Get Email Settings from Forgotten Password Node (current node)
-                var emailFrom       = CurrentPage.GetPropertyValue("emailFrom", "robot@your-site.co.uk").ToString();
-                var emailSubject    = CurrentPage.GetPropertyValue("emailSubject", "CWS - Forgotten Password").ToString();
+                // S6: Get Member's plain password for display in email (client requested). This will only work with Encrypted passwords so we will need to confirm security issues are acceptable with client before implementing on production
+                UsersMembershipProvider ump = new UsersMembershipProvider();
+                string plainPassword = ump.UnEncodePassword(findMember.Password);
+                
+                //Get Email Settings from Forgotten Password Node (current node)                
+                string adminEmail = Umbraco.TypedContentAtRoot().Where(x => x.DocumentTypeAlias == "CWS-Home").SingleOrDefault().GetPropertyValue("adminEmail").ToString();                                
+                //var emailFrom       = CurrentPage.GetPropertyValue("emailFrom", "robot@yourdomain.com").ToString();
+                var emailSubject    = CurrentPage.GetPropertyValue("emailSubject", "Forgotten Password").ToString();
 
                 //Send user an email to reset password with GUID in it
-                EmailHelper.SendResetPasswordEmail(findMember.Email, emailFrom, emailSubject,  expiryTime.ToString("ddMMyyyyHHmmssFFFF"));
+                //EmailHelper.SendResetPasswordEmail(findMember.Email, emailFrom, emailSubject,  expiryTime.ToString("ddMMyyyyHHmmssFFFF"));
+                EmailHelper.SendForgottenPasswordEmail(findMember.Email, plainPassword, adminEmail, emailSubject,  expiryTime.ToString("ddMMyyyyHHmmssFFFF"));
             }
             else
             {
