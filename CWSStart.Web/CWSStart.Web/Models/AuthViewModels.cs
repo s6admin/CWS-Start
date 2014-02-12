@@ -36,28 +36,29 @@ namespace CWSStart.Web.Models
         public string MembershipType { get; set; }
         
         [DisplayName("Company Name")]
-        [Required(ErrorMessage = "Please enter your Company's name")]
+        [Required(ErrorMessage = "Required")]
         public string CompanyName { get; set; }
 
         [DisplayName("Sold To #")]
-        [Required(ErrorMessage = "Please enter your Sold To Number")]
+        [Required(ErrorMessage = "Required")]
         public string SoldToNum { get; set; }
         
-        [Required(ErrorMessage = "Please enter your name")]
+        [Required(ErrorMessage = "Required")]
         public string Name { get; set; } // S6: Contact Name
 
         [DisplayName("Email address")]
-        [Required(ErrorMessage = "Please enter your email address")]
-        [EmailAddress(ErrorMessage = "Please enter a valid email address")]
-        [Remote("CheckEmailIsUsed", "AuthSurface", ErrorMessage = "The email address has already been registered")]
+        [Required(ErrorMessage = "Required")]
+        [EmailAddress(ErrorMessage = "Please enter a valid email")]
+        [Remote("CheckEmailIsUsed", "AuthSurface", ErrorMessage = "This email has already been registered.")]
         public string EmailAddress { get; set; }
 
         [DisplayName("Phone")]
-        [Required(ErrorMessage = "Please enter your phone number")]
-        [Phone(ErrorMessage = "Please enter a valid phone number")]
+        [Required(ErrorMessage = "Required")]
+        //[Phone(ErrorMessage = "Please enter a valid phone number")]
+        [RegularExpression("^1?[-\\. ]?(\\(\\d{3}\\)?[-\\. ]?|\\d{3}?[-\\. ]?)?\\d{3}?[-\\. ]?\\d{4}$", ErrorMessage="Please enter a valid phone number" )]
         public string Phone { get; set; }
-
-        [Required(ErrorMessage = "You must agree to the Terms and Conditions")]        
+                
+        [RegularExpression("true|True", ErrorMessage="You must agree to the Perks Program Terms and Conditions.")]
         public bool AgreedToTerms { get; set; }
 
         [HiddenInput(DisplayValue = false)]
