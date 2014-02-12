@@ -186,6 +186,17 @@ namespace CWSStart.Web.Controllers
                 return CurrentUmbracoPage();
             }
 
+            //Get Email Settings from Forgotten Password Node (current node)                
+            string adminEmail = Umbraco.TypedContentAtRoot().Where(x => x.DocumentTypeAlias == "CWS-Home").SingleOrDefault().GetPropertyValue("adminEmail").ToString();
+            if (adminEmail.Length == 0) // Do not attempt sending email without a valid admin "from" address
+            {
+                return CurrentUmbracoPage();
+            }
+                        
+            EmailHelper.SendSignUpEmailToAdmin(model, adminEmail); 
+
+            /* // S6: Do not automatically create Members as a result of a Sign Up request.
+
             //Member Type
             MemberType cwsMemberType = MemberType.GetByAlias("CWS-Member");
 
@@ -198,13 +209,13 @@ namespace CWSStart.Web.Controllers
                 Member createMember = Member.MakeNew(model.Name, model.EmailAddress, model.EmailAddress, cwsMemberType, adminUser);
 
                 //Set password on the newly created member
-                createMember.Password = model.Password;
-
+                //createMember.Password = model.Password; // S6: Password must be randomly generated if account creation is automatic
+                
                 //Set the verified email to false
                 createMember.getProperty("hasVerifiedEmail").Value = false;
 
                 //Set the profile URL
-                createMember.getProperty("profileURL").Value = model.ProfileURL;
+                //createMember.getProperty("profileURL").Value = model.ProfileURL; // S6 Removed from Model
 
                 //Set member group
                 var memberGroup = MemberGroup.GetByName("CWS-Members");
@@ -247,7 +258,9 @@ namespace CWSStart.Web.Controllers
 
 
             //Send out verification email, with GUID in it
-            EmailHelper.SendVerifyEmail(model.EmailAddress, emailFrom, emailSubject, tempGUID.ToString());
+            //EmailHelper.SendVerifyEmail(model.EmailAddress, emailFrom, emailSubject, tempGUID.ToString());
+            
+            */
 
             //Update success flag (in a TempData key)
             TempData["IsSuccessful"] = true;
@@ -298,7 +311,11 @@ namespace CWSStart.Web.Controllers
                 string plainPassword = ump.UnEncodePassword(findMember.Password);
                 
                 //Get Email Settings from Forgotten Password Node (current node)                
-                string adminEmail = Umbraco.TypedContentAtRoot().Where(x => x.DocumentTypeAlias == "CWS-Home").SingleOrDefault().GetPropertyValue("adminEmail").ToString();                                
+                string adminEmail = Umbraco.TypedContentAtRoot().Where(x => x.DocumentTypeAlias == "CWS-Home").SingleOrDefault().GetPropertyValue("adminEmail").ToString();
+                if (adminEmail.Length == 0) // Do not attempt sending email without a valid admin "from" address
+                {
+                    return CurrentUmbracoPage();
+                }
                 //var emailFrom       = CurrentPage.GetPropertyValue("emailFrom", "robot@yourdomain.com").ToString();
                 var emailSubject    = CurrentPage.GetPropertyValue("emailSubject", "Forgotten Password").ToString();
 
@@ -401,7 +418,7 @@ namespace CWSStart.Web.Controllers
 
 
 
-        //Verify Email
+        // Verify Email
         /// <summary>
         /// Renders the Verify Email
         /// @Html.Action("RenderVerifyEmail","AuthSurface");
@@ -440,7 +457,7 @@ namespace CWSStart.Web.Controllers
             return PartialView("VerifyEmail");
         }
 
-        //REMOTE - Validation
+        // REMOTE - Validation
         /// <summary>
         /// Used with jQuery Validate to check when user registers that email address not already used
         /// </summary>

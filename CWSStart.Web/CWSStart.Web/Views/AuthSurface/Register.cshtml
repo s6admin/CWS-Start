@@ -2,6 +2,8 @@
 @using Umbraco.Web
 @using CWSStart.Web.Controllers
 @using CWSStart.Web.Models
+@using Umbraco.Core.Services;
+
 @model RegisterViewModel
 
 @{
@@ -12,8 +14,8 @@
 @if (Convert.ToBoolean(TempData["IsSuccessful"]))
 {
     <div class="alert alert-success">
-        <h4>Yay!</h4>
-        <p>You have now registered - please verify your email address to continue</p>
+        <h4>Your Registration Has Be Receieved</h4>
+        <p>We will review your details and send you a confirmation email once your account has been approved.</p>
     </div>
 }
 else
@@ -23,7 +25,50 @@ else
         @Html.AntiForgeryToken()
         @Html.ValidationSummary(false)
 
+        IDataTypeService dts = ApplicationContext.Current.Services.DataTypeService;        
+        var memberTypeDef = dts.GetAllDataTypeDefinitions().Where(x => x.Name == "[S6] Perks Membership Type").FirstOrDefault();
+        var memberTypeValues = dts.GetPreValuesByDataTypeId(memberTypeDef.Id);
+        
+        <table id="tableMembershipType" cellpadding="0" cellspacing="0">
+            <tr>
+                <th class="lbl level">choose <span>level</span></th>
+                <th class="light"><img src="/Images/membershipLight.png" alt="Perks Light" /><br/>@memberTypeValues.ElementAtOrDefault(0)</th>
+                <th class="medium"><img src="/Images/membershipMedium.png" alt="Perks Medium" /><br />@memberTypeValues.ElementAtOrDefault(1)</th>
+                <th class="bold last"><img src="/Images/membershipBold.png" alt="Perks Bold" /><br />@memberTypeValues.ElementAtOrDefault(2)</th>
+            </tr>
+            <tr>
+                <td class="lbl">Annual Incremental Breakroom Volume Commitment</td>
+                <td class="light">$75,000</td>
+                <td class="medium">$125,000</td>
+                <td class="bold last">$200,000</td>
+            </tr>
+            <tr>
+                <td class="lbl">Annual Equipment Allowance</td>
+                <td class="light">$2,500</td>
+                <td class="medium">$5,000</td>
+                <td class="bold last">$10,000</td>
+            </tr>
+            <tr>
+                <td class="lbl choose">Please choose your Perks membership level</td>
+                <td class="light">@Html.RadioButtonFor(model => model.MembershipType, memberTypeValues.ElementAtOrDefault(0).ToString(), new { @class = "control-radiobutton", @name = "level"})</td>
+                <td class="medium">@Html.RadioButtonFor(model => model.MembershipType, memberTypeValues.ElementAtOrDefault(1).ToString(), new { @class = "control-radiobutton", @name = "level"})</td>
+                <td class="bold last">@Html.RadioButtonFor(model => model.MembershipType, memberTypeValues.ElementAtOrDefault(2).ToString(), new { @class = "control-radiobutton", @name = "level"})</td>
+            </tr>
+        </table>    
+    
         <fieldset>
+            <div class="form-group">
+                @Html.LabelFor(model => model.CompanyName, new { @class = "control-label" })
+                @Html.TextBoxFor(model => model.CompanyName, new { @class = "form-control tbCompanyName", placeholder = "Your Company's Name" })
+                @Html.ValidationMessageFor(model => model.CompanyName, string.Empty, new { @class="help-block"})
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.SoldToNum, new { @class = "control-label" })
+                @Html.TextBoxFor(model => model.SoldToNum, new { @class = "form-control tbSoldToNum", placeholder = "" })
+                @Html.ValidationMessageFor(model => model.SoldToNum, string.Empty, new { @class = "help-block" })
+            </div>
+
             <div class="form-group">
                 @Html.LabelFor(model => model.Name, new { @class = "control-label"})
                 @Html.TextBoxFor(model => model.Name, new{ @class = "form-control", placeholder = "Your Name" })
@@ -35,20 +80,33 @@ else
                 @Html.TextBoxFor(model => model.EmailAddress, new{ @class = "form-control", placeholder = "Email Address" })
                 @Html.ValidationMessageFor(model => model.EmailAddress, string.Empty, new { @class= "help-block" })
             </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Phone, new { @class = "control-label" })
+                @Html.TextBoxFor(model => model.Phone, new { @class = "form-control tbPhone", placeholder = "Phone" })
+                @Html.ValidationMessageFor(model => model.Phone, string.Empty, new { @class = "help-block" })
+            </div>
             
             <div class="form-group">
-                @Html.LabelFor(model => model.Password, new { @class = "control-label"})
-                @Html.PasswordFor(model => model.Password, new{ @class = "form-control", placeholder = "Password" })
-                @Html.ValidationMessageFor(model => model.Password, string.Empty, new { @class= "help-block" })
+                @Html.CheckBoxFor(model => model.AgreedToTerms, new { @class = "control-checkbox" })
+                @Html.LabelFor(model => model.AgreedToTerms, new { @class = "control-label" })
+                @Html.ValidationMessageFor(model => model.AgreedToTerms, string.Empty, new { @class = "help-block" })
             </div>
-        
+            
+            @*  <div class="form-group">
+                    @Html.LabelFor(model => model.Password, new { @class = "control-label"})
+                    @Html.PasswordFor(model => model.Password, new{ @class = "form-control", placeholder = "Password" })
+                    @Html.ValidationMessageFor(model => model.Password, string.Empty, new { @class= "help-block" })
+                </div>
+           
+
             <div class="form-group">
                 @Html.LabelFor(model => model.ConfirmPassword, new { @class = "control-label"})
                 @Html.PasswordFor(model => model.ConfirmPassword, new{ @class = "form-control", placeholder = "Confirm Password" })
                 @Html.ValidationMessageFor(model => model.ConfirmPassword, string.Empty, new { @class= "help-block" })
             </div>
-            
-            @*<div class="form-group">
+                       
+            <div class="form-group">
                 @Html.LabelFor(model => model.ProfileURL, new { @class = "control-label"})
                 <div class="input-group">
                     <span class="input-group-addon">http://site.co.uk/user/</span>

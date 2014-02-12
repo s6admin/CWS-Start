@@ -6,6 +6,7 @@ using System.Net.Mail;
 using System.Web;
 using CWSStart.Web.Models;
 using Umbraco.Web;
+using System.Net.Sockets;
 
 namespace CWSStart.Web.CWSExtensions
 {
@@ -48,8 +49,7 @@ namespace CWSStart.Web.CWSExtensions
             //Return the SMTP object
             return smtp;
         }
-
-
+        
         public static void SendContactEmail(ContactFormViewModel model, string emailTo, string emailSubject)
         {
             //Create email address with friendly display names
@@ -76,6 +76,31 @@ namespace CWSStart.Web.CWSExtensions
                 throw ex;
             }
 
+        }
+
+        public static void SendAccountActivationEmail(string memberEmail, string memberPassword, string emailFrom, string emailSubject)
+        {
+            
+            string message =    "<h3>Your Perks Account Has Been Activated</h3>"+
+                                "<p>Congratulations, your Perks account has been approved and activated.</p>"+
+                                "<p>You may log in using your email and password listed below:</p>"+
+                                "<p>Username: " + memberEmail+"</p>"+
+                                "<p>Password: " + memberPassword + "</p>"+
+                                "<p></p>";
+
+            MailMessage email = new MailMessage(emailFrom, memberEmail);
+            email.Subject = emailSubject;
+            email.IsBodyHtml = true;
+            email.Body = message;
+            try
+            {
+                SmtpClient smtp = GetSmtpClient();
+                smtp.Send(email);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public static void SendResetPasswordEmail(string memberEmail, string emailFrom, string emailSubject, string resetGUID)
@@ -173,18 +198,34 @@ namespace CWSStart.Web.CWSExtensions
             }
         }
 
-        public static void SendSignUpEmailToAdmin(string memberEmail, string emailFrom, string emailSubject, string verifyGUID)
+        public static void SendSignUpEmailToAdmin(RegisterViewModel model, string adminEmail)
         {
-            MailMessage email = new MailMessage();
+                       
+            string clientIPAddress = Dns.GetHostAddresses(Dns.GetHostName()).Where(x => x.AddressFamily == AddressFamily.InterNetwork).FirstOrDefault().ToString();                        
+            string message =
+                "<h3>Sign Up Request</h3>" +
+                "<p></p>" +
+                "<p> Member Type: " + model.MembershipType + "</p>" +
+                "<p>Contact Name: " + model.Name + "</p>" +
+                "<p>Company Name: " + model.CompanyName + "</p>" +
+                "<p> Sold To Num: " + model.SoldToNum + "</p>" +
+                "<p>       Email: " + model.EmailAddress + "</p>" +
+                "<p>       Phone: " + model.Phone + "</p>" +
+                //"<p>          IP: " + clientIPAddress +"</p>" +                
+                "";
+            MailMessage email = new MailMessage(model.EmailAddress, adminEmail);
+            email.Subject = "Sign Up Request";
+            email.IsBodyHtml = true;
+            email.Body = message;
 
             try
             {   
                 SmtpClient smtp = GetSmtpClient();
-                smtp.Send(email); //Try & send the email with the SMTP settings
+                smtp.Send(email); 
             }
             catch (Exception ex)
             {
-                throw ex; //Throw an exception if there is a problem sending the email
+                throw ex; 
             }
         }
     }
