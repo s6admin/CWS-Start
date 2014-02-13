@@ -320,8 +320,10 @@ namespace CWSStart.Web.Controllers
                 var emailSubject    = CurrentPage.GetPropertyValue("emailSubject", "Forgotten Password").ToString();
 
                 //Send user an email to reset password with GUID in it
-                //EmailHelper.SendResetPasswordEmail(findMember.Email, emailFrom, emailSubject,  expiryTime.ToString("ddMMyyyyHHmmssFFFF"));
-                EmailHelper.SendForgottenPasswordEmail(findMember.Email, plainPassword, adminEmail, emailSubject,  expiryTime.ToString("ddMMyyyyHHmmssFFFF"));
+                //EmailHelper.SendResetPasswordEmail(findMember.Email, emailFrom, emailSubject,  expiryTime.ToString("ddMMyyyyHHmmssFFFF"));                
+                EmailHelper.SendForgottenPasswordEmailToAdmin(findMember.getProperty("contactName").Value.ToString(), findMember.Email, adminEmail);
+
+                TempData["IsSuccessful"] = true;
             }
             else
             {

@@ -139,7 +139,7 @@ namespace CWSStart.Web.CWSExtensions
 
         }
 
-        public static void SendForgottenPasswordEmail(string memberEmail, string memberPassword, string emailFrom, string emailSubject, string verifyGUID)
+        public static void SendForgottenPasswordEmail(string memberEmail, string memberPassword, string emailFrom)
         {
 
             var message = string.Format(
@@ -149,7 +149,7 @@ namespace CWSStart.Web.CWSExtensions
                                "<p>For security purposes please delete and remove this email from your trash as soon as possible.</p>");
 
             MailMessage email = new MailMessage(emailFrom, memberEmail);
-            email.Subject = emailSubject;
+            email.Subject = "Your Forgotten Password";
             email.IsBodyHtml = true;
             email.Body = message;
 
@@ -226,6 +226,28 @@ namespace CWSStart.Web.CWSExtensions
             catch (Exception ex)
             {
                 throw ex; 
+            }
+        }
+
+        public static void SendForgottenPasswordEmailToAdmin(string memberName, string memberEmail, string adminEmail)
+        {
+            string message =
+                "<h3>Forgotten Password</h3>" +
+                "<p>" + memberName + " has forgotten their password.</p>" +
+                "<p>Please send a password reminder to " + memberEmail + " from the Members dashboard.</p>";
+
+            MailMessage email = new MailMessage(memberEmail, adminEmail);
+            email.Subject = "Forgotten Password";
+            email.IsBodyHtml = true;
+            email.Body = message;
+            try
+            {
+                SmtpClient smtp = GetSmtpClient();
+                smtp.Send(email);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
     }
