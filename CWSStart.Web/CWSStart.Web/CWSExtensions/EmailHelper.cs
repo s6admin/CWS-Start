@@ -250,5 +250,32 @@ namespace CWSStart.Web.CWSExtensions
                 throw ex;
             }
         }
+
+        public static void SendOrderMyBrewersEmailToAdmin(string memberName, string memberEmail, string adminEmail, string itemsTable, float totalPrice, int totalItems)
+        {
+            string message =
+               "<h3>Order My Brewers</h3>" +
+               "<p>" + memberName + " (" + memberEmail + ") has ordered new items.</p>" +
+               "<p></p>" +
+               itemsTable + 
+               "<p></p>"+
+               "<p>Total Items: " + totalItems.ToString() + "<br/>" +
+               "<p>Total Price: $" + totalPrice.ToString() + "<br/>" +
+               "";
+
+            MailMessage email = new MailMessage(memberEmail, adminEmail);
+            email.Subject = "New Brewers Order";
+            email.IsBodyHtml = true;
+            email.Body = message;
+            try
+            {
+                SmtpClient smtp = GetSmtpClient();
+                smtp.Send(email);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

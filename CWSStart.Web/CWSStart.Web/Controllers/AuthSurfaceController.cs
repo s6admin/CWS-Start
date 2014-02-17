@@ -28,8 +28,9 @@ namespace CWSStart.Web.Controllers
             //If the returnURL is empty...
             if (string.IsNullOrEmpty(HttpContext.Request["ReturnUrl"]))
             {
-                //Then set it to root - '/'
-                loginModel.ReturnUrl = "/";
+                // Then set it to My Account
+                //loginModel.ReturnUrl = "/";
+                loginModel.ReturnUrl = "/my-account";
             }
             else
             {
