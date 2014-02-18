@@ -7,6 +7,7 @@ using System.Web.Mvc;
 using System.Web.Security;
 using CWSStart.Web.CWSExtensions;
 using umbraco.BusinessLogic;
+using umbraco.providers.members;
 using umbraco.cms.businesslogic.member;
 using Umbraco.Web;
 using Umbraco.Web.Mvc;
@@ -307,10 +308,10 @@ namespace CWSStart.Web.Controllers
                 //Save the member with the up[dated property value
                 findMember.Save();
 
-                // S6: Get Member's plain password for display in email (client requested). This will only work with Encrypted passwords so we will need to confirm security issues are acceptable with client before implementing on production
-                UsersMembershipProvider ump = new UsersMembershipProvider();
-                string plainPassword = ump.UnEncodePassword(findMember.Password);
-                
+                // S6: Get Member's plain password for display in email (client requested). This will only work with Encrypted passwords so we will need to confirm security issues are acceptable with client before implementing on production                                
+                string plainPassword;                                
+                plainPassword = ((UmbracoMembershipProvider)Membership.Provider).UnEncodePassword(findMember.Password);
+                                                
                 //Get Email Settings from Forgotten Password Node (current node)                
                 string adminEmail = Umbraco.TypedContentAtRoot().Where(x => x.DocumentTypeAlias == "CWS-Home").SingleOrDefault().GetPropertyValue("adminEmail").ToString();
                 if (adminEmail.Length == 0) // Do not attempt sending email without a valid admin "from" address
@@ -322,7 +323,8 @@ namespace CWSStart.Web.Controllers
 
                 //Send user an email to reset password with GUID in it
                 //EmailHelper.SendResetPasswordEmail(findMember.Email, emailFrom, emailSubject,  expiryTime.ToString("ddMMyyyyHHmmssFFFF"));                
-                EmailHelper.SendForgottenPasswordEmailToAdmin(findMember.getProperty("contactName").Value.ToString(), findMember.Email, adminEmail);
+                EmailHelper.SendForgottenPasswordEmail(findMember.Email, plainPassword, adminEmail);
+                //EmailHelper.SendForgottenPasswordEmailToAdmin(findMember.getProperty("contactName").Value.ToString(), findMember.Email, adminEmail);
 
                 TempData["IsSuccessful"] = true;
             }
