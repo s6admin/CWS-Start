@@ -15,6 +15,7 @@ using CWSStart.Web.Models;
 using System.Net.Sockets;
 
 using umbraco.providers; // S6
+using Umbraco.Core.Logging;
 
 namespace CWSStart.Web.Controllers
 {
@@ -138,6 +139,7 @@ namespace CWSStart.Web.Controllers
             catch (Exception ex)
             {
                 ModelState.AddModelError("LoginForm.", "Error: " + ex.ToString());
+                LogHelper.Error(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType, ex.Message, ex);
                 return CurrentUmbracoPage();
             }
 
@@ -195,7 +197,7 @@ namespace CWSStart.Web.Controllers
                 return CurrentUmbracoPage();
             }
                         
-            EmailHelper.SendSignUpEmailToAdmin(model, adminEmail); 
+            EmailHelper.SendSignUpEmailToAdmin(model, adminEmail);
 
             /* // S6: Do not automatically create Members as a result of a Sign Up request.
 
@@ -230,7 +232,7 @@ namespace CWSStart.Web.Controllers
             {
                 //EG: Duplicate email address - already exists
                 ModelState.AddModelError("memberCreation", ex.Message);
-                
+                LogHelper.Error(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType, ex.Message, ex);
                 return CurrentUmbracoPage();
             }
 

@@ -36,29 +36,29 @@ namespace CWSStart.Web.Models
         public string MembershipType { get; set; }
         
         [DisplayName("Company Name")]
-        [Required(ErrorMessage = "Required")]
+        [Required(ErrorMessage = "Company Name is required")]
         public string CompanyName { get; set; }
 
         [DisplayName("Sold To #")]
-        [Required(ErrorMessage = "Required")]
+        [Required(ErrorMessage = "Sold To # is required")]
         public string SoldToNum { get; set; }
         
-        [Required(ErrorMessage = "Required")]
+        [Required(ErrorMessage = "Contact Name is required")]
         public string Name { get; set; } // S6: Contact Name
 
         [DisplayName("Email address")]
-        [Required(ErrorMessage = "Required")]
+        [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Please enter a valid email")]
         [Remote("CheckEmailIsUsed", "AuthSurface", ErrorMessage = "This email has already been registered.")]
         public string EmailAddress { get; set; }
 
         [DisplayName("Phone")]
-        [Required(ErrorMessage = "Required")]
+        [Required(ErrorMessage = "Phone is required")]
         //[Phone(ErrorMessage = "Please enter a valid phone number")]
         [RegularExpression("^1?[-\\. ]?(\\(\\d{3}\\)?[-\\. ]?|\\d{3}?[-\\. ]?)?\\d{3}?[-\\. ]?\\d{4}$", ErrorMessage="Please enter a valid phone number" )]
         public string Phone { get; set; }
                 
-        [RegularExpression("true|True", ErrorMessage="You must agree to the Perks Program Terms and Conditions.")]
+        [RegularExpression("true|True", ErrorMessage="You must agree to the Perks Program Terms and Conditions")]
         public bool AgreedToTerms { get; set; }
 
         [HiddenInput(DisplayValue = false)]
