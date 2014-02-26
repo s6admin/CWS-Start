@@ -75,7 +75,28 @@ namespace CWSStart.Web.CWSExtensions
                 //Throw an exception if there is a problem sending the email
                 throw ex;
             }
+        }
 
+        public static void SendQuestionsEmail(int memberId, string memberDisplayName, string memberEmail, string adminEmail, string message)
+        {
+            //Create email address with friendly display names
+            MailAddress emailAddressFrom = new MailAddress(memberEmail, memberDisplayName);
+            MailAddress emailAddressTo = new MailAddress(adminEmail, "Questions Form");
+
+            //Generate an email message object to send
+            MailMessage email = new MailMessage(emailAddressFrom, emailAddressTo);
+            email.Subject = "Questions Form";
+            email.Body = message;
+
+            try
+            {   
+                SmtpClient smtp = GetSmtpClient();
+                smtp.Send(email);
+            }
+            catch (Exception ex)
+            {                
+                throw ex;                
+            }
         }
 
         public static void SendAccountActivationEmail(string memberEmail, string memberPassword, string emailFrom, string emailSubject)
