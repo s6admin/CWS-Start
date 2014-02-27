@@ -68,66 +68,54 @@ namespace CWSStart.Web.Controllers
             {
                 //Try and login the user...
                 if (Membership.ValidateUser(model.EmailAddress, model.Password))
-                {
+                {                    
                     //Valid credentials
 
                     //Get the member from their email address
-                    var checkMember = Member.GetMemberFromEmail(model.EmailAddress);
+                    Member checkMember = Member.GetMemberFromEmail(model.EmailAddress);
 
                     //Check the member exists
                     if (checkMember != null)
                     {
-                        //Let's check they have verified their email address
-                        if (Convert.ToBoolean(checkMember.getProperty("hasVerifiedEmail").Value))
+                        /* S6:  - Account must be activated via admin before the standard login process verification can occur.                          
+                                - Email verification has been removed entirely as it is not required for this site structure.
+                         */
+                        if (!Convert.ToBoolean(checkMember.getProperty("accountActivated").Value))
                         {
-                            //Update number of logins counter
-                            int noLogins = 0;
-                            if (int.TryParse(checkMember.getProperty("numberOfLogins").Value.ToString(), out noLogins))
-                            {
-                                //Managed to parse it to a number
-                                //Don't need to do anything as we have default value of 0
-                            }
-
-                            //Update the counter
-                            checkMember.getProperty("numberOfLogins").Value = noLogins + 1;
-
-                            //Update label with last login date to now
-                            checkMember.getProperty("lastLoggedIn").Value = DateTime.Now.ToString("dd/MM/yyyy @ HH:mm:ss");
-
-                            //Update label with last logged in IP address & Host Name
-                            string hostName         = Dns.GetHostName();
-                            string clientIPAddress = Dns.GetHostAddresses(hostName).Where(x => x.AddressFamily == AddressFamily.InterNetwork).FirstOrDefault().ToString(); 
-
-                            checkMember.getProperty("hostNameOfLastLogin").Value    = hostName;
-                            checkMember.getProperty("IPofLastLogin").Value          = clientIPAddress;
-
-                            //Save the details
-                            checkMember.Save();
-
-                            //If they have verified then lets log them in
-                            //Set Auth cookie
-                            FormsAuthentication.SetAuthCookie(model.EmailAddress, true);
-
-                            //Once logged in - redirect them back to the return URL
-                            return new RedirectResult(model.ReturnUrl);
+                            return CurrentUmbracoPage();                            
                         }
-                        else
+                                              
+                        //Update number of logins counter
+                        int noLogins = 0;
+                        if (int.TryParse(checkMember.getProperty("numberOfLogins").Value.ToString(), out noLogins))
                         {
-                            //User has not verified their email yet
-                            ModelState.AddModelError("LoginForm.", "Email account has not been verified. A verification email has been resent to you.");
-
-                            //Get the verify guid on the member (so we can resend out verification email)
-                            var verifyGUID = checkMember.getProperty("emailVerifyGUID").Value.ToString();
-
-                            //Get Email Settings from Login Node (current node)
-                            var emailFrom       = CurrentPage.GetPropertyValue("emailFrom", "robot@your-site.co.uk").ToString();
-                            var emailSubject    = CurrentPage.GetPropertyValue("emailSubject", "CWS - Verify Email").ToString();
-
-                            //Send out verification email, with GUID in it
-                            EmailHelper.SendVerifyEmail(checkMember.Email, emailFrom, emailSubject, verifyGUID);
-
-                            return CurrentUmbracoPage();
+                            //Managed to parse it to a number
+                            //Don't need to do anything as we have default value of 0
                         }
+
+                        //Update the counter
+                        checkMember.getProperty("numberOfLogins").Value = noLogins + 1;
+
+                        //Update label with last login date to now
+                        checkMember.getProperty("lastLoggedIn").Value = DateTime.Now.ToString("dd/MM/yyyy @ HH:mm:ss");
+
+                        //Update label with last logged in IP address & Host Name
+                        string hostName         = Dns.GetHostName();
+                        string clientIPAddress = Dns.GetHostAddresses(hostName).Where(x => x.AddressFamily == AddressFamily.InterNetwork).FirstOrDefault().ToString(); 
+
+                        checkMember.getProperty("hostNameOfLastLogin").Value    = hostName;
+                        checkMember.getProperty("IPofLastLogin").Value          = clientIPAddress;
+
+                        //Save the details
+                        checkMember.Save();
+
+                        //If they have verified then lets log them in
+                        //Set Auth cookie
+                        FormsAuthentication.SetAuthCookie(model.EmailAddress, true);
+
+                        //Once logged in - redirect them back to the return URL
+                        return new RedirectResult(model.ReturnUrl);
+                        
                     }
                 }
                 else
@@ -422,9 +410,7 @@ namespace CWSStart.Web.Controllers
 
             return RedirectToCurrentUmbracoPage();
         }
-
-
-
+        
         // Verify Email
         /// <summary>
         /// Renders the Verify Email
