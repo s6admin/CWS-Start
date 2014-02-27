@@ -155,9 +155,7 @@ namespace CWSStart.Web.Controllers
                 return Redirect("/");
             }
         }
-
-
-
+        
         //Register
         /// <summary>
         /// Renders the Register View
@@ -178,7 +176,7 @@ namespace CWSStart.Web.Controllers
                 return CurrentUmbracoPage();
             }
 
-            //Get Email Settings from Forgotten Password Node (current node)                
+            // Get Email Settings from Forgotten Password Node (current node)                
             string adminEmail = Umbraco.TypedContentAtRoot().Where(x => x.DocumentTypeAlias == "CWS-Home").SingleOrDefault().GetPropertyValue("adminEmail").ToString();
             if (adminEmail.Length == 0) // Do not attempt sending email without a valid admin "from" address
             {
@@ -186,7 +184,7 @@ namespace CWSStart.Web.Controllers
             }
                         
             EmailHelper.SendSignUpEmailToAdmin(model, adminEmail);
-
+            
             /* // S6: Do not automatically create Members as a result of a Sign Up request.
 
             //Member Type

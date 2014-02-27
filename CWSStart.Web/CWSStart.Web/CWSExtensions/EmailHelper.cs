@@ -12,9 +12,9 @@ namespace CWSStart.Web.CWSExtensions
 {
     public static class EmailHelper
     {
-        private const string SMTPServer = ""; //"smtp.mandrillapp.com";
-        private const string SMTPUser = ""; //"warren@creativewebspecialist.co.uk";
-        private const string SMTPPassword = ""; //"h4GMK-gX9CB7KXjUePMNaA";
+        private const string SMTPServer = "";
+        private const string SMTPUser = "";
+        private const string SMTPPassword = "";
         private const int SMTPPort = 25;
 
         public static SmtpClient GetSmtpClient()
@@ -99,20 +99,14 @@ namespace CWSStart.Web.CWSExtensions
             }
         }
 
-        public static void SendAccountActivationEmail(string memberEmail, string memberPassword, string emailFrom, string emailSubject)
+        public static void SendAccountActivationEmail(string memberEmail, string emailFrom, string emailSubject, string emailMessage)
         {
-            
-            string message =    "<h3>Your Perks Account Has Been Activated</h3>"+
-                                "<p>Congratulations, your Perks account has been approved and activated.</p>"+
-                                "<p>You may log in using your email and password listed below:</p>"+
-                                "<p>Username: " + memberEmail+"</p>"+
-                                "<p>Password: " + memberPassword + "</p>"+
-                                "<p></p>";
-
+         
             MailMessage email = new MailMessage(emailFrom, memberEmail);
             email.Subject = emailSubject;
             email.IsBodyHtml = true;
-            email.Body = message;
+            email.Body = emailMessage;
+
             try
             {
                 SmtpClient smtp = GetSmtpClient();
@@ -218,7 +212,7 @@ namespace CWSStart.Web.CWSExtensions
                 throw ex;
             }
         }
-
+        
         public static void SendSignUpEmailToAdmin(RegisterViewModel model, string adminEmail)
         {
                        
