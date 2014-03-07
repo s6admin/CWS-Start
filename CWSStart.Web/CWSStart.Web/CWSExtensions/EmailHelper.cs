@@ -6,6 +6,7 @@ using System.Net.Mail;
 using System.Web;
 using CWSStart.Web.Models;
 using Umbraco.Web;
+using Umbraco.Core.Logging;
 using System.Net.Sockets;
 
 namespace CWSStart.Web.CWSExtensions
@@ -85,16 +86,18 @@ namespace CWSStart.Web.CWSExtensions
 
             //Generate an email message object to send
             MailMessage email = new MailMessage(emailAddressFrom, emailAddressTo);
-            email.Subject = "Questions Form";
+            email.Subject = "Questions Form"; 
             email.Body = message;
 
             try
             {   
                 SmtpClient smtp = GetSmtpClient();
                 smtp.Send(email);
+                LogHelper.Info(typeof(EmailHelper), "Questions Form Submission - from:" + memberEmail + " (" + memberId + "), message: " + message);
             }
             catch (Exception ex)
-            {                
+            {
+                LogHelper.Error(typeof(EmailHelper), "Questions Form Submission Error ", ex);
                 throw ex;                
             }
         }
@@ -111,9 +114,11 @@ namespace CWSStart.Web.CWSExtensions
             {
                 SmtpClient smtp = GetSmtpClient();
                 smtp.Send(email);
+                LogHelper.Info(typeof(EmailHelper), "Account Activation Email Sent - for:" + memberEmail);
             }
             catch (Exception ex)
             {
+                LogHelper.Error(typeof(EmailHelper), "Account Activation Email Send Error ", ex);
                 throw ex;
             }
         }
@@ -137,18 +142,14 @@ namespace CWSStart.Web.CWSExtensions
             email.Body = message;
 
             try
-            {
-                //Connect to SMTP using MailChimp transactional email service Mandrill
-                //Connect to SMTP using MailChimp transactional email service Mandrill
-                //This uses the values on the homenode OR fallback to test details above
-                SmtpClient smtp = GetSmtpClient();
-
-                //Try & send the email with the SMTP settings
+            {             
+                SmtpClient smtp = GetSmtpClient();                
                 smtp.Send(email);
+                LogHelper.Info(typeof(EmailHelper), "Reset Password Email Sent - for:" + memberEmail);
             }
             catch (Exception ex)
             {
-                //Throw an exception if there is a problem sending the email
+                LogHelper.Error(typeof(EmailHelper), "Reset Password Email Send Error ", ex);
                 throw ex;
             }
 
@@ -172,9 +173,10 @@ namespace CWSStart.Web.CWSExtensions
             {
                 SmtpClient smtp = GetSmtpClient();
                 smtp.Send(email);
+                LogHelper.Info(typeof(EmailHelper), "Forgotten Password Email Sent - for:" + memberEmail);
             }
             catch (Exception ex) {
-                
+                LogHelper.Error(typeof(EmailHelper), "Forgotten Password Email Send Error ", ex);
                 throw ex;
             }
         }
@@ -236,14 +238,22 @@ namespace CWSStart.Web.CWSExtensions
             try
             {   
                 SmtpClient smtp = GetSmtpClient();
-                smtp.Send(email); 
+                smtp.Send(email);
+                LogHelper.Info(typeof(EmailHelper), "Sign Up Email Sent To Admin - for:" + model.EmailAddress);
             }
             catch (Exception ex)
             {
+                LogHelper.Error(typeof(EmailHelper), "Sign Up Email Send Error ", ex);
                 throw ex; 
             }
         }
 
+        /// <summary>
+        /// UNUSED. Forgotten passwords are sent directly to the end user via email. Sends a forgotten password email reminder to the admin account from a user.
+        /// </summary>
+        /// <param name="memberName"></param>
+        /// <param name="memberEmail"></param>
+        /// <param name="adminEmail"></param>
         public static void SendForgottenPasswordEmailToAdmin(string memberName, string memberEmail, string adminEmail)
         {
             string message =
@@ -286,9 +296,11 @@ namespace CWSStart.Web.CWSExtensions
             {
                 SmtpClient smtp = GetSmtpClient();
                 smtp.Send(email);
+                LogHelper.Info(typeof(EmailHelper), "New Brewers Order - for: " + memberEmail);
             }
             catch (Exception ex)
             {
+                LogHelper.Error(typeof(EmailHelper), "New Brewers Order Error ", ex);
                 throw ex;
             }
         }
